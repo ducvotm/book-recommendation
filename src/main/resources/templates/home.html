@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Mood Recommender</title>
+  <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Find Books for Your Mood</h1>
+    
+    <div class="mood-selector">
+      <select id="mood">
+        <option value="">Select your mood...</option>
+        <option value="HAPPY">😊 Happy</option>
+        <option value="SAD">😢 Sad</option>
+        <option value="EXCITED">🤩 Excited</option>
+        <option value="RELAXED">😌 Relaxed</option>
+        <option value="ANXIOUS">😰 Anxious</option>
+      </select>
+      <button id="getBooks">Get Recommendations</button>
+    </div>
+
+    <div id="recommendations"></div>
+  </div>
+
+  <script src="/static/script.js"></script>
+</body>
+</html>

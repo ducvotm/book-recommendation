@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Book Recommendations by Mood</title>
+  <style>
+    /* Styling for the MVP */
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+      background-color: #f9f9f9;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    .mood-selector {
+      margin-bottom: 20px;
+    }
+
+    .mood-selector select, .mood-selector button {
+      padding: 10px;
+      font-size: 16px;
+      margin: 10px;
+    }
+
+    .book-list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .book-card {
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 15px;
+      width: 200px;
+      background: #fff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      text-align: left;
+    }
+
+    .book-card img {
+      max-width: 100%;
+      border-radius: 5px;
+    }
+
+    .loading, .error, .no-results {
+      color: #777;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Book Recommendations by Mood</h1>
+  
+  <!-- Mood selector -->
+  <div class="mood-selector">
+    <label for="mood">Choose your mood:</label>
+    <select id="mood">
+      <option value="">-- Select Mood --</option>
+      <option value="happy">Happy</option>
+      <option value="sad">Sad</option>
+      <option value="adventurous">Adventurous</option>
+      <option value="romantic">Romantic</option>
+      <option value="curious">Curious</option>
+    </select>
+    <button id="getBooks">Get Recommendations</button>
+  </div>
+  
+  <!-- Recommendations rendering area -->
+  <div id="recommendations">
+    <p>Select a mood and click "Get Recommendations" to begin!</p>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    // Handle button click to fetch recommendations
+    document.getElementById('getBooks').addEventListener('click', () => {
+      const mood = document.getElementById('mood').value; // Get selected mood
+      const recommendations = document.getElementById('recommendations'); // Recommendations container
+
+      // Clear previous results
+      recommendations.innerHTML = "";
+
+      // Check if a mood is selected
+      if (!mood) {
+        recommendations.innerHTML = "<p class='error'>Please select a mood to get recommendations.</p>";
+        return;
+      }
+
+      // Display loading placeholder
+      recommendations.innerHTML = "<p class='loading'>Loading recommendations...</p>";
+
+      // Fetch book recommendations from backend API
+      fetch(`/recommendations?mood=${mood}`) // Replace with your real backend API endpoint
+        .then(response => {
+          if (!response.ok) throw new Error("Failed to retrieve recommendations.");
+          return response.json();
+        })
+        .then(data => {
+          // Clear loading text
+          recommendations.innerHTML = "";
+
+          // Check if books are returned
+          const books = data.books;
+          if (!books || books.length === 0) {
+            recommendations.innerHTML = "<p class='no-results'>No recommendations found for this mood.</p>";
+            return;
+          }
+
+          // Create book cards
+          const bookList = document.createElement('div');
+          bookList.classList.add('book-list');
+
+          books.forEach(book => {
+            const bookCard = document.createElement('div');
+            bookCard.classList.add('book-card');
+
+            const thumbnail =
+              book.volumeInfo.imageLinks?.thumbnail || "https://via.placeholder.com/150";
+            const title =
+              book.volumeInfo.title || "No title available";
+            const description =
+              book.volumeInfo.description || "No description available.";
+
+            bookCard.innerHTML = `
+              <img src="${thumbnail}" alt="Book Cover">
+              <h3>${title}</h3>
+              <p>${description}</p>
+            `;
+
+            bookList.appendChild(bookCard);
+          });
+
+          // Add book cards to recommendations container
+          recommendations.appendChild(bookList);
+        })
+        .catch(error => {
+          // Handle errors (e.g., network issues)
+          recommendations.innerHTML = `<p class='error'>Error: ${error.message}</p>`;
+        });
+    });
+  </script>
+</body>
+</html>
